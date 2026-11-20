@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>다이렉트 오토 금융계산기 (카드할부 & 선납금 캐시백)</title>
+  <style>
+    :root {
+      --primary: #1a4b8c;
+      --primary-dark: #103261;
+      --primary-light: #eef4fc;
+      --accent: #0066ff;
+      --dolphin: #0b6e99;
+      --dolphin-light: #e6f4fa;
+      --dolphin-border: #9fd5eb;
+      --cashback-bg: #e6f7f0;
+      --cashback-text: #0a7b4c;
+      --cashback-border: #a3e4c7;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #191f28;
+      --text-sub: #4e5968;
+      --text-muted: #8b95a1;
+      --border: #e5e8eb;
+      --input-bg: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #ffffff;
+      padding: 20px 18px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 8px;
+    }
+
+    header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.18);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    header p {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .tag-blue {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .tag-dolphin {
+      background: var(--dolphin-light);
+      color: var(--dolphin);
+    }
+
+    .tag-green {
+      background: var(--cashback-bg);
+      color: var(--cashback-text);
+    }
+
+    .reset-btn {
+      font-size: 12px;
+      color: var(--text-sub);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .reset-btn:active {
+      background: #e5e8eb;
+    }
+
+    /* Promo Mode Selector */
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mode-btn {
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mode-btn .m-title {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .mode-btn .m-sub {
+      display: block;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .mode-btn.active-basic {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .mode-btn.active-basic .m-title {
+      color: var(--primary);
+    }
+
+    .mode-btn.active-dolphin {
+      background: var(--dolphin-light);
+      border-color: var(--dolphin);
+    }
+
+    .mode-btn.active-dolphin .m-title {
+      color: var(--dolphin);
+    }
+
+    .promo-notice {
+      background: var(--dolphin-light);
+      border: 1px solid var(--dolphin-border);
+      color: var(--dolphin);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 9px 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .promo-notice.visible {
+      display: block;
+    }
+
+    .cb-promo-notice {
+      background: var(--dolphin-light);
+      border: 1px solid var(--dolphin-border);
+      color: var(--dolphin);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 8px 11px;
+      border-radius: 10px;
+      margin-top: 10px;
+      display: none;
+      line-height: 1.45;
+    }
+
+    .cb-promo-notice.visible {
+      display: block;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .input-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      height: 48px;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .input-box:focus-within {
+      border-color: var(--accent);
+      background: #ffffff;
+    }
+
+    .input-box input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: right;
+      outline: none;
+    }
+
+    .input-unit {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
+    .quick-amounts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .quick-btn {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      border-radius: 8px;
+      padding: 7px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .quick-btn:active {
+      background: #d8e6f8;
+    }
+
+    .quick-cb-btn {
+      background: var(--cashback-bg);
+      color: var(--cashback-text);
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      padding: 7px 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quick-cb-btn:active {
+      background: #c7eedc;
+    }
+
+    .quick-cb-btn.dolphin-cb-btn {
+      background: var(--dolphin-light);
+      color: var(--dolphin);
+      border-color: var(--dolphin-border);
+      font-weight: 700;
+    }
+
+    .quick-cb-btn.dolphin-cb-btn.active {
+      background: var(--dolphin);
+      color: #ffffff;
+      border-color: var(--dolphin);
+    }
+
+    /* Term Tabs */
+    .term-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .term-tab {
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .term-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(26, 75, 140, 0.25);
+    }
+
+    .term-tab.active.dolphin-active {
+      background: var(--dolphin);
+      border-color: var(--dolphin);
+      box-shadow: 0 4px 10px rgba(11, 110, 153, 0.25);
+    }
+
+    .term-tab .t-month {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .term-tab .t-rate {
+      display: block;
+      font-size: 11px;
+      margin-top: 2px;
+      opacity: 0.88;
+    }
+
+    /* Highlight Summary Box */
+    .summary-highlight {
+      background: var(--primary-light);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid #d2e3f8;
+    }
+
+    .summary-highlight.dolphin-highlight {
+      background: var(--dolphin-light);
+      border-color: var(--dolphin-border);
+    }
+
+    .main-pay-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .main-pay-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .dolphin-highlight .main-pay-label {
+      color: var(--dolphin);
+    }
+
+    .main-pay-val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .dolphin-highlight .main-pay-val {
+      color: var(--dolphin);
+    }
+
+    .main-pay-val span {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* Cashback Result Box */
+    .cashback-highlight {
+      background: var(--cashback-bg);
+      border: 1px solid var(--cashback-border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .cashback-highlight.dolphin-cb-highlight {
+      background: var(--dolphin-light);
+      border-color: var(--dolphin-border);
+    }
+
+    .cb-row-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .cb-row-main .cb-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cashback-text);
+    }
+
+    .dolphin-cb-highlight .cb-row-main .cb-label {
+      color: var(--dolphin);
+    }
+
+    .cb-row-main .cb-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--cashback-text);
+    }
+
+    .dolphin-cb-highlight .cb-row-main .cb-val {
+      color: var(--dolphin);
+    }
+
+    /* Detail Rows */
+    .detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13.5px;
+    }
+
+    .detail-row .d-label {
+      color: var(--text-sub);
+    }
+
+    .detail-row .d-val {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .inline-edit-box {
+      display: inline-flex;
+      align-items: center;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+      width: 96px;
+    }
+
+    .inline-edit-box input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      color: var(--accent);
+      outline: none;
+    }
+
+    .inline-edit-box span {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-left: 3px;
+    }
+
+    /* All Terms Comparison Table */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -6px;
+      padding: 0 6px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th:first-child, td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: #ffffff;
+      font-weight: 600;
+      color: var(--text-sub);
+      z-index: 2;
+      box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    th:first-child {
+      background: #f8fafc;
+    }
+
+    .col-highlight {
+      background-color: #f4f8fe !important;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .col-highlight.dolphin-col {
+      background-color: var(--dolphin-light) !important;
+      color: var(--dolphin);
+    }
+
+    .mini-input {
+      width: 54px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px 5px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: #ffffff;
+    }
+
+    .footer-note {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>다이렉트 오토 금융계산기</h1>
+    <span class="badge">카드할부 · 돌핀 프로모션 · 캐시백</span>
+  </div>
+  <p>기본 금리와 BYD DOLPHIN 프로모션 할부금리, 선납금 캐시백을 계산할 수 있습니다.</p>
+</header>
+
+<div class="container">
+  <!-- 1. 카드할부 계산기 영역 -->
+  <div class="card">
+    <div class="section-title">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <span>① 카드할부 계산기</span>
+        <span class="title-tag tag-blue" id="rateModeBadge">기본 금리</span>
+      </div>
+      <button type="button" class="reset-btn" onclick="resetInstallment()">할부 초기화</button>
+    </div>
+
+    <div class="mode-switch">
+      <button type="button" class="mode-btn active-basic" id="modeBasicBtn" onclick="setRateMode('basic')">
+        <span class="m-title">기본 금리</span>
+        <span class="m-sub">일반 다이렉트 오토 금리</span>
+      </button>
+      <button type="button" class="mode-btn" id="modeDolphinBtn" onclick="setRateMode('dolphin')">
+        <span class="m-title">BYD 돌핀 프로모션</span>
+        <span class="m-sub">26.11.16~11.30 원금구간별 금리</span>
+      </button>
+    </div>
+
+    <div class="promo-notice" id="promoNotice">
+      BYD DOLPHIN 전용 금리 적용 중 · 현재 할부원금 기준 구간이 자동 반영되었습니다. (금리 직접 수정 가능)
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span>할부금액 (할부원금)</span>
+        <span id="amountKorean" style="color: var(--primary); font-weight: 700;">2,000만원</span>
+      </div>
+      <div class="input-box">
+        <input type="text" id="principalInput" inputmode="numeric" value="20,000,000" oninput="onPrincipalInput(this)" />
+        <span class="input-unit">원</span>
+      </div>
+      <div class="quick-amounts">
+        <button type="button" class="quick-btn" onclick="addPrincipal(1000000)">+100만</button>
+        <button type="button" class="quick-btn" onclick="addPrincipal(5000000)">+500만</button>
+        <button type="button" class="quick-btn" onclick="addPrincipal(10000000)">+1,000만</button>
+        <button type="button" class="quick-btn" onclick="setPrincipal(20000000)">2,000만</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <div class="input-label">
+        <span>할부기간 선택</span>
+      </div>
+      <div class="term-tabs" id="termTabs"></div>
+    </div>
+
+    <div class="summary-highlight" id="summaryHighlight">
+      <div class="main-pay-row">
+        <span class="main-pay-label" id="selectedTermTitle">36개월 월납부금액</span>
+        <div class="main-pay-val"><span id="selMonthly" style="font-size: 24px; font-weight: 800;">596,728</span> <span>원</span></div>
+      </div>
+    </div>
+
+    <div class="detail-list">
+      <div class="detail-row">
+        <span class="d-label">적용 연이율 (직접 수정 가능)</span>
+        <div class="inline-edit-box">
+          <input type="number" id="selRateInput" step="0.1" min="0" max="30" inputmode="decimal" oninput="onSelectedRateChange(this.value)" />
+          <span>%</span>
+        </div>
+      </div>
+      <div class="detail-row">
+        <span class="d-label">할부원금</span>
+        <span class="d-val" id="selPrincipal">20,000,000 원</span>
+      </div>
+      <div class="detail-row">
+        <span class="d-label">총 할부이자</span>
+        <span class="d-val" id="selInterest">1,482,208 원</span>
+      </div>
+      <div class="detail-row">
+        <span class="d-label">총납부금액 (원금 + 이자)</span>
+        <span class="d-val" id="selTotal" style="color: var(--primary);">21,482,208 원</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 전체 할부 기간 비교 표 -->
+  <div class="card">
+    <div class="section-title">
+      <span>할부기간별 한눈에 비교</span>
+      <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">좌우 스크롤 가능 →</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr id="tableHeadRow">
+            <th>할부개월수</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. 선납금(일시불) 캐시백 계산기 (별도 분리) -->
+  <div class="card">
+    <div class="section-title">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <span>② 선납금 캐시백 계산기</span>
+        <span class="title-tag tag-green" id="cbBadge">일시불 결제분</span>
+      </div>
+      <button type="button" class="reset-btn" onclick="resetDownPayment()">선납금 초기화</button>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span>카드 선납금 (일시불 결제금액)</span>
+        <span id="downPayKorean" style="color: var(--cashback-text); font-weight: 700;">1,000만원</span>
+      </div>
+      <div class="input-box">
+        <input type="text" id="downPayInput" inputmode="numeric" value="10,000,000" oninput="onDownPayInput(this)" />
+        <span class="input-unit">원</span>
+      </div>
+      <div class="quick-amounts">
+        <button type="button" class="quick-cb-btn" onclick="addDownPay(1000000)">+100만</button>
+        <button type="button" class="quick-cb-btn" onclick="addDownPay(5000000)">+500만</button>
+        <button type="button" class="quick-cb-btn" onclick="addDownPay(10000000)">+1,000만</button>
+        <button type="button" class="quick-cb-btn" onclick="setDownPay(10000000)">1,000만</button>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span>선납금 캐시백율</span>
+      </div>
+      <div class="input-box" style="height: 44px;">
+        <input type="number" id="cbRateInput" step="0.1" min="0" max="20" inputmode="decimal" value="1.0" oninput="onCbRateManualInput()" />
+        <span class="input-unit">%</span>
+      </div>
+      <div class="quick-amounts">
+        <button type="button" class="quick-cb-btn" id="cbBtn10" onclick="setCbRate(1.0, false)">1.0%</button>
+        <button type="button" class="quick-cb-btn" id="cbBtn15" onclick="setCbRate(1.5, false)">1.5%</button>
+        <button type="button" class="quick-cb-btn" id="cbBtn20" onclick="setCbRate(2.0, false)">2.0%</button>
+        <button type="button" class="quick-cb-btn dolphin-cb-btn" id="cbBtnDolphin50" onclick="setCbRate(5.0, true)">돌핀 5.0%</button>
+      </div>
+      <div class="cb-promo-notice" id="cbDolphinNotice">
+        BYD DOLPHIN 카드일시불 5.0% (1.0% + 4.0% 추가 캐시백) 선택됨 · 다이렉트 오토 카드일시불 1,000만원 이상 결제 기준이며, 할부/무이자 혜택과 중복 시 추가 캐시백(4.0%)은 제외됩니다.
+      </div>
+    </div>
+
+    <div class="cashback-highlight" id="cashbackHighlight">
+      <div class="cb-row-main">
+        <span class="cb-label" id="cbResultLabel">선납금 캐시백 혜택</span>
+        <span class="cb-val" id="cbAmountResult">+ 100,000 원</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-note">
+    ※ 카드할부(원리금균등상환)와 일시불 선납금 캐시백은 별도로 산출됩니다.<br/>
+    BYD DOLPHIN 프로모션 금리 및 캐시백은 행사 기간(2026.11.16~2026.11.30) 및 상품 조건에 따라 달라질 수 있습니다.
+  </p>
+</div>
+
+<script>
+  const defaultTerms = [
+    { months: 12, rate: 4.5 },
+    { months: 24, rate: 4.6 },
+    { months: 36, rate: 4.7 },
+    { months: 48, rate: 4.7 },
+    { months: 60, rate: 4.8 }
+  ];
+
+  // BYD DOLPHIN 프로모션 할부금리표 (할부원금 기준)
+  function getDolphinPromoRate(months, principal) {
+    if (months === 12) {
+      return 0.0;
+    }
+    if (months === 24) {
+      if (principal <= 20000000) return 0.0;
+      if (principal <= 26000000) return 0.7;
+      return 1.2;
+    }
+    if (months === 36) {
+      if (principal <= 14500000) return 0.0;
+      if (principal <= 20000000) return 1.4;
+      if (principal <= 26000000) return 2.2;
+      return 2.4;
+    }
+    if (months === 48) {
+      if (principal <= 14500000) return 1.3;
+      if (principal <= 20000000) return 2.2;
+      if (principal <= 26000000) return 2.8;
+      return 3.0;
+    }
+    if (months === 60) {
+      if (principal <= 14500000) return 2.1;
+      if (principal <= 20000000) return 2.9;
+      if (principal <= 26000000) return 3.3;
+      return 3.5;
+    }
+    return 0.0;
+  }
+
+  let rateMode = "basic"; // "basic" | "dolphin"
+  let isDolphinCbSelected = false;
+  let terms = JSON.parse(JSON.stringify(defaultTerms));
+  let selectedIndex = 2; // 기본 36개월 선택
+
+  function formatNumber(num) {
+    return Math.round(num).toLocaleString("ko-KR");
+  }
+
+  function formatKoreanCurrency(num) {
+    if (!num || num <= 0) return "0원";
+    const eok = Math.floor(num / 100000000);
+    const man = Math.floor((num % 100000000) / 10000);
+    const rest = num % 10000;
+    let res = "";
+    if (eok > 0) res += eok.toLocaleString("ko-KR") + "억 ";
+    if (man > 0) res += man.toLocaleString("ko-KR") + "만 ";
+    if (rest > 0 && eok === 0) res += rest.toLocaleString("ko-KR") + " ";
+    return res.trim() + "원";
+  }
+
+  function applyRateModeToTerms(principal) {
+    if (rateMode === "dolphin") {
+      terms = terms.map((t) => ({
+        months: t.months,
+        rate: getDolphinPromoRate(t.months, principal)
+      }));
+    } else {
+      terms = JSON.parse(JSON.stringify(defaultTerms));
+    }
+  }
+
+  function setRateMode(mode) {
+    rateMode = mode;
+    const isDolphin = mode === "dolphin";
+
+    document.getElementById("modeBasicBtn").className = "mode-btn" + (!isDolphin ? " active-basic" : "");
+    document.getElementById("modeDolphinBtn").className = "mode-btn" + (isDolphin ? " active-dolphin" : "");
+
+    const badge = document.getElementById("rateModeBadge");
+    badge.textContent = isDolphin ? "BYD 돌핀 프로모션" : "기본 금리";
+    badge.className = "title-tag " + (isDolphin ? "tag-dolphin" : "tag-blue");
+
+    document.getElementById("promoNotice").className = "promo-notice" + (isDolphin ? " visible" : "");
+    document.getElementById("summaryHighlight").className = "summary-highlight" + (isDolphin ? " dolphin-highlight" : "");
+    document.getElementById("selTotal").style.color = isDolphin ? "var(--dolphin)" : "var(--primary)";
+
+    applyRateModeToTerms(getPrincipal());
+    recalculateInstallment();
+  }
+
+  /* --- ① 카드할부 관련 함수 --- */
+  function getPrincipal() {
+    const raw = document.getElementById("principalInput").value.replace(/[^0-9]/g, "");
+    return parseInt(raw, 10) || 0;
+  }
+
+  function onPrincipalInput(el) {
+    const raw = el.value.replace(/[^0-9]/g, "");
+    const val = parseInt(raw, 10) || 0;
+    el.value = val > 0 ? val.toLocaleString("ko-KR") : "";
+    document.getElementById("amountKorean").textContent = formatKoreanCurrency(val);
+    if (rateMode === "dolphin") {
+      applyRateModeToTerms(val);
+    }
+    recalculateInstallment();
+  }
+
+  function addPrincipal(delta) {
+    setPrincipal(getPrincipal() + delta);
+  }
+
+  function setPrincipal(amount) {
+    const safeAmount = Math.max(0, amount);
+    const input = document.getElementById("principalInput");
+    input.value = safeAmount.toLocaleString("ko-KR");
+    document.getElementById("amountKorean").textContent = formatKoreanCurrency(safeAmount);
+    if (rateMode === "dolphin") {
+      applyRateModeToTerms(safeAmount);
+    }
+    recalculateInstallment();
+  }
+
+  function calcPMT(principal, annualRatePercent, months) {
+    if (principal <= 0 || months <= 0) return 0;
+    const r = (annualRatePercent / 100) / 12;
+    if (r === 0) return Math.round(principal / months);
+    const factor = Math.pow(1 + r, months);
+    const pmt = (principal * r * factor) / (factor - 1);
+    return Math.round(pmt);
+  }
+
+  function selectTerm(idx) {
+    selectedIndex = idx;
+    recalculateInstallment();
+  }
+
+  function onSelectedRateChange(val) {
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0) {
+      terms[selectedIndex].rate = num;
+      recalculateInstallment(true);
+    }
+  }
+
+  function onTableRateChange(idx, val) {
+    const num = parseFloat(val);
+    if (!isNaN(num) && num >= 0) {
+      terms[idx].rate = num;
+      recalculateInstallment(false);
+    }
+  }
+
+  function resetInstallment() {
+    selectedIndex = 2;
+    setRateMode("basic");
+    setPrincipal(20000000);
+  }
+
+  function recalculateInstallment(skipSelRateInput = false) {
+    const principal = getPrincipal();
+    const isDolphin = rateMode === "dolphin";
+
+    // 상단 개월수 탭 렌더링
+    const tabsEl = document.getElementById("termTabs");
+    tabsEl.innerHTML = "";
+    terms.forEach((t, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const isSelected = idx === selectedIndex;
+      btn.className = "term-tab" + (isSelected ? " active" : "") + (isSelected && isDolphin ? " dolphin-active" : "");
+      btn.onclick = () => selectTerm(idx);
+      const rateLabel = t.rate === 0 ? "무이자" : `${t.rate.toFixed(1)}%`;
+      btn.innerHTML = `<span class="t-month">${t.months}개월</span><span class="t-rate">${rateLabel}</span>`;
+      tabsEl.appendChild(btn);
+    });
+
+    // 선택 개월수 상세 계산
+    const cur = terms[selectedIndex];
+    const monthly = calcPMT(principal, cur.rate, cur.months);
+    const total = monthly * cur.months;
+    const interest = Math.max(0, total - principal);
+
+    document.getElementById("selectedTermTitle").textContent = `${cur.months}개월 월납부금액`;
+    document.getElementById("selMonthly").textContent = formatNumber(monthly);
+
+    if (!skipSelRateInput) {
+      document.getElementById("selRateInput").value = cur.rate;
+    }
+    document.getElementById("selPrincipal").textContent = `${formatNumber(principal)} 원`;
+    document.getElementById("selInterest").textContent = `${formatNumber(interest)} 원`;
+    document.getElementById("selTotal").textContent = `${formatNumber(total)} 원`;
+
+    // 전체 비교 테이블 업데이트
+    const headRow = document.getElementById("tableHeadRow");
+    headRow.innerHTML = "<th>할부개월수</th>";
+    terms.forEach((t, idx) => {
+      const th = document.createElement("th");
+      th.textContent = `${t.months}개월`;
+      if (idx === selectedIndex) {
+        th.className = "col-highlight" + (isDolphin ? " dolphin-col" : "");
+      }
+      th.style.cursor = "pointer";
+      th.onclick = () => selectTerm(idx);
+      headRow.appendChild(th);
+    });
+
+    const results = terms.map((t) => {
+      const m = calcPMT(principal, t.rate, t.months);
+      const tot = m * t.months;
+      const intr = Math.max(0, tot - principal);
+      return { m, tot, intr };
+    });
+
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    // 연이율 행
+    const trRate = document.createElement("tr");
+    trRate.innerHTML = "<td>연이율 (%)</td>";
+    terms.forEach((t, idx) => {
+      const td = document.createElement("td");
+      if (idx === selectedIndex) {
+        td.className = "col-highlight" + (isDolphin ? " dolphin-col" : "");
+      }
+      const inp = document.createElement("input");
+      inp.type = "number";
+      inp.step = "0.1";
+      inp.inputMode = "decimal";
+      inp.className = "mini-input";
+      inp.value = t.rate;
+      inp.oninput = (e) => onTableRateChange(idx, e.target.value);
+      td.appendChild(inp);
+      trRate.appendChild(td);
+    });
+    tbody.appendChild(trRate);
+
+    const addRow = (label, getter) => {
+      const tr = document.createElement("tr");
+      const tdLabel = document.createElement("td");
+      tdLabel.textContent = label;
+      tr.appendChild(tdLabel);
+
+      results.forEach((r, idx) => {
+        const td = document.createElement("td");
+        if (idx === selectedIndex) {
+          td.className = "col-highlight" + (isDolphin ? " dolphin-col" : "");
+        }
+        td.textContent = `${formatNumber(getter(r))}원`;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    };
+
+    addRow("월납부금액", (r) => r.m);
+    addRow("총 할부이자", (r) => r.intr);
+    addRow("총납부금액", (r) => r.tot);
+  }
+
+  /* --- ② 선납금 캐시백 관련 함수 --- */
+  function getDownPay() {
+    const raw = document.getElementById("downPayInput").value.replace(/[^0-9]/g, "");
+    return parseInt(raw, 10) || 0;
+  }
+
+  function onDownPayInput(el) {
+    const raw = el.value.replace(/[^0-9]/g, "");
+    const val = parseInt(raw, 10) || 0;
+    el.value = val > 0 ? val.toLocaleString("ko-KR") : "";
+    document.getElementById("downPayKorean").textContent = formatKoreanCurrency(val);
+    recalculateCashback();
+  }
+
+  function addDownPay(delta) {
+    setDownPay(getDownPay() + delta);
+  }
+
+  function setDownPay(amount) {
+    const input = document.getElementById("downPayInput");
+    input.value = amount.toLocaleString("ko-KR");
+    document.getElementById("downPayKorean").textContent = formatKoreanCurrency(amount);
+    recalculateCashback();
+  }
+
+  function updateCbUiState() {
+    const dolphinBtn = document.getElementById("cbBtnDolphin50");
+    const badge = document.getElementById("cbBadge");
+    const notice = document.getElementById("cbDolphinNotice");
+    const highlight = document.getElementById("cashbackHighlight");
+    const label = document.getElementById("cbResultLabel");
+
+    if (isDolphinCbSelected) {
+      dolphinBtn.className = "quick-cb-btn dolphin-cb-btn active";
+      badge.textContent = "돌핀 5.0% 캐시백";
+      badge.className = "title-tag tag-dolphin";
+      notice.className = "cb-promo-notice visible";
+      highlight.className = "cashback-highlight dolphin-cb-highlight";
+      label.textContent = "돌핀 5.0% 캐시백 혜택";
+    } else {
+      dolphinBtn.className = "quick-cb-btn dolphin-cb-btn";
+      badge.textContent = "일시불 결제분";
+      badge.className = "title-tag tag-green";
+      notice.className = "cb-promo-notice";
+      highlight.className = "cashback-highlight";
+      label.textContent = "선납금 캐시백 혜택";
+    }
+  }
+
+  function setCbRate(rate, isDolphin = false) {
+    isDolphinCbSelected = isDolphin;
+    document.getElementById("cbRateInput").value = rate.toFixed(1);
+    updateCbUiState();
+    recalculateCashback();
+  }
+
+  function onCbRateManualInput() {
+    const currentVal = parseFloat(document.getElementById("cbRateInput").value);
+    isDolphinCbSelected = Math.abs(currentVal - 5.0) < 0.001;
+    updateCbUiState();
+    recalculateCashback();
+  }
+
+  function resetDownPayment() {
+    isDolphinCbSelected = false;
+    document.getElementById("cbRateInput").value = "1.0";
+    updateCbUiState();
+    setDownPay(10000000);
+  }
+
+  function recalculateCashback() {
+    const downPay = getDownPay();
+    const cbRate = parseFloat(document.getElementById("cbRateInput").value) || 0;
+    const cbAmount = Math.round(downPay * (cbRate / 100));
+
+    document.getElementById("cbAmountResult").textContent = `+ ${formatNumber(cbAmount)} 원`;
+  }
+
+  // 초기 렌더링
+  recalculateInstallment();
+  recalculateCashback();
+</script>
+</body>
+</html>
