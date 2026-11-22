@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>다이렉트 오토 금융계산기 (카드할부 & 선납금 캐시백)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
       --primary: #1a4b8c;
@@ -43,11 +44,16 @@
     header {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: #ffffff;
-      padding: 20px 18px 22px;
+      padding: 18px 18px 20px;
       position: sticky;
       top: 0;
       z-index: 100;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-inner {
+      max-width: 680px;
+      margin: 0 auto;
     }
 
     .header-top {
@@ -56,6 +62,7 @@
       align-items: center;
       margin-bottom: 4px;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     header h1 {
@@ -78,10 +85,89 @@
       color: rgba(255, 255, 255, 0.85);
     }
 
+    /* Action Bar for Print / Image / PDF */
+    .export-toolbar {
+      max-width: 680px;
+      margin: 12px auto 0;
+      padding: 0 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .export-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: #ffffff;
+      color: var(--text-main);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s;
+    }
+
+    .export-btn:active {
+      transform: scale(0.98);
+      background: #f1f5f9;
+    }
+
+    .export-btn.btn-print {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .export-btn.btn-img {
+      border-color: var(--dolphin);
+      color: var(--dolphin);
+      background: var(--dolphin-light);
+    }
+
+    .export-btn.btn-pdf {
+      border-color: var(--cashback-text);
+      color: var(--cashback-text);
+      background: var(--cashback-bg);
+    }
+
     .container {
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
-      padding: 14px;
+      padding: 12px 14px 14px;
+    }
+
+    /* Print / Capture Header (Hidden on normal screen, visible in print & image export) */
+    .doc-header {
+      display: none;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .doc-header-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.4px;
+    }
+
+    .doc-header-sub {
+      font-size: 11.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .doc-header-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
     }
 
     .card {
@@ -148,7 +234,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .mode-btn {
@@ -199,9 +285,9 @@
       color: var(--dolphin);
       font-size: 12px;
       font-weight: 600;
-      padding: 9px 12px;
+      padding: 8px 12px;
       border-radius: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: none;
     }
 
@@ -251,7 +337,7 @@
       border: 1.5px solid var(--border);
       border-radius: 12px;
       padding: 0 14px;
-      height: 48px;
+      height: 46px;
       transition: border-color 0.2s, background-color 0.2s;
     }
 
@@ -342,7 +428,7 @@
       background: var(--input-bg);
       border: 1.5px solid var(--border);
       border-radius: 12px;
-      padding: 10px 4px;
+      padding: 9px 4px;
       text-align: center;
       cursor: pointer;
       transition: all 0.15s;
@@ -363,7 +449,7 @@
 
     .term-tab .t-month {
       display: block;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
     }
 
@@ -378,8 +464,8 @@
     .summary-highlight {
       background: var(--primary-light);
       border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
+      padding: 15px 16px;
+      margin-bottom: 12px;
       border: 1px solid #d2e3f8;
     }
 
@@ -405,7 +491,7 @@
     }
 
     .main-pay-val {
-      font-size: 24px;
+      font-size: 23px;
       font-weight: 800;
       color: var(--primary);
       letter-spacing: -0.5px;
@@ -425,8 +511,8 @@
       background: var(--cashback-bg);
       border: 1px solid var(--cashback-border);
       border-radius: 14px;
-      padding: 16px;
-      margin-top: 14px;
+      padding: 15px 16px;
+      margin-top: 12px;
     }
 
     .cashback-highlight.dolphin-cb-highlight {
@@ -451,7 +537,7 @@
     }
 
     .cb-row-main .cb-val {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 800;
       color: var(--cashback-text);
     }
@@ -464,7 +550,7 @@
     .detail-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .detail-row {
@@ -520,13 +606,13 @@
 
     table {
       width: 100%;
-      min-width: 520px;
+      min-width: 500px;
       border-collapse: collapse;
       font-size: 12.5px;
     }
 
     th, td {
-      padding: 10px 8px;
+      padding: 9px 8px;
       text-align: right;
       border-bottom: 1px solid var(--border);
     }
@@ -580,21 +666,263 @@
       color: var(--text-muted);
       text-align: center;
       margin-top: 8px;
-      line-height: 1.4;
+      line-height: 1.45;
+    }
+
+    /* Capture Mode (for clean Image export) */
+    body.capture-mode {
+      background: #ffffff;
+      padding-bottom: 0;
+    }
+
+    body.capture-mode .container {
+      width: 680px;
+      max-width: 680px;
+      background: #ffffff;
+      padding: 24px;
+    }
+
+    body.capture-mode .doc-header {
+      display: flex;
+    }
+
+    body.capture-mode .no-export,
+    body.capture-mode .quick-amounts,
+    body.capture-mode .reset-btn,
+    body.capture-mode .mode-switch {
+      display: none !important;
+    }
+
+    body.capture-mode .card {
+      box-shadow: none;
+      border: 1px solid #d0d7de;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+    }
+
+    body.capture-mode .input-box {
+      height: 38px;
+      background: #f8fafc;
+      border: 1px solid #d0d7de;
+    }
+
+    body.capture-mode .input-box input {
+      font-size: 16px;
+    }
+
+    body.capture-mode .table-wrap {
+      overflow: visible;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.capture-mode table {
+      min-width: 100%;
+    }
+
+    /* A4 Single-Page Print Styles */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      html, body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 12px !important;
+        line-height: 1.35 !important;
+      }
+
+      header,
+      .export-toolbar,
+      .no-export,
+      .quick-amounts,
+      .reset-btn,
+      .mode-switch {
+        display: none !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .doc-header {
+        display: flex !important;
+        margin-bottom: 10px !important;
+        padding-bottom: 8px !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 10px !important;
+        padding: 12px 14px !important;
+        margin-bottom: 9px !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .section-title {
+        font-size: 13.5px !important;
+        margin-bottom: 8px !important;
+      }
+
+      .promo-notice,
+      .cb-promo-notice {
+        padding: 6px 10px !important;
+        margin-bottom: 8px !important;
+        margin-top: 6px !important;
+        font-size: 11px !important;
+      }
+
+      .input-group {
+        margin-bottom: 8px !important;
+      }
+
+      .input-label {
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+      }
+
+      .input-box {
+        height: 34px !important;
+        border-radius: 8px !important;
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+
+      .input-box input {
+        font-size: 15px !important;
+      }
+
+      .term-tabs {
+        margin-bottom: 8px !important;
+        gap: 5px !important;
+      }
+
+      .term-tab {
+        padding: 6px 4px !important;
+        border-radius: 8px !important;
+      }
+
+      .term-tab .t-month {
+        font-size: 12px !important;
+      }
+
+      .term-tab .t-rate {
+        font-size: 10px !important;
+      }
+
+      .summary-highlight,
+      .cashback-highlight {
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
+        margin-top: 8px !important;
+        border-radius: 9px !important;
+      }
+
+      .main-pay-val,
+      .cb-row-main .cb-val {
+        font-size: 19px !important;
+      }
+
+      .detail-list {
+        gap: 5px !important;
+      }
+
+      .detail-row {
+        font-size: 12px !important;
+      }
+
+      .inline-edit-box {
+        padding: 2px 6px !important;
+        width: 82px !important;
+      }
+
+      .inline-edit-box input {
+        font-size: 12.5px !important;
+      }
+
+      .table-wrap {
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      table {
+        min-width: 100% !important;
+        font-size: 11.5px !important;
+      }
+
+      th, td {
+        padding: 5px 6px !important;
+      }
+
+      th:first-child, td:first-child {
+        position: static !important;
+        box-shadow: none !important;
+      }
+
+      .mini-input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        width: 44px !important;
+        font-size: 11.5px !important;
+      }
+
+      .footer-note {
+        font-size: 10px !important;
+        margin-top: 6px !important;
+      }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="header-top">
-    <h1>다이렉트 오토 금융계산기</h1>
-    <span class="badge">카드할부 · 돌핀 프로모션 · 캐시백</span>
+  <div class="header-inner">
+    <div class="header-top">
+      <h1>다이렉트 오토 금융계산기</h1>
+      <span class="badge">카드할부 · 돌핀 프로모션 · 캐시백</span>
+    </div>
+    <p>기본 금리와 BYD DOLPHIN 프로모션 할부금리, 선납금 캐시백을 계산할 수 있습니다.</p>
   </div>
-  <p>기본 금리와 BYD DOLPHIN 프로모션 할부금리, 선납금 캐시백을 계산할 수 있습니다.</p>
 </header>
 
-<div class="container">
+<div class="export-toolbar">
+  <button type="button" class="export-btn btn-print" onclick="printA4()">
+    <span>🖨️ A4 인쇄</span>
+  </button>
+  <button type="button" class="export-btn btn-pdf" onclick="saveAsPdf()">
+    <span>📄 PDF 저장</span>
+  </button>
+  <button type="button" class="export-btn btn-img" id="saveImgBtn" onclick="saveAsImage()">
+    <span>🖼️ 사진 저장</span>
+  </button>
+</div>
+
+<div class="container" id="captureArea">
+  <!-- 인쇄 및 이미지 저장 시 상단 제목 영역 -->
+  <div class="doc-header">
+    <div>
+      <div class="doc-header-title">삼성카드 다이렉트 오토 금융 견적 안내</div>
+      <div class="doc-header-sub">카드할부 원리금균등상환 및 선납금(일시불) 캐시백 산출 내역</div>
+    </div>
+    <div class="doc-header-date" id="docDateText"></div>
+  </div>
+
   <!-- 1. 카드할부 계산기 영역 -->
   <div class="card">
     <div class="section-title">
@@ -617,7 +945,7 @@
     </div>
 
     <div class="promo-notice" id="promoNotice">
-      BYD DOLPHIN 전용 금리 적용 중 · 현재 할부원금 기준 구간이 자동 반영되었습니다. (금리 직접 수정 가능)
+      BYD DOLPHIN 전용 금리 적용 중 · 현재 할부원금 기준 구간이 자동 반영되었습니다.
     </div>
 
     <div class="input-group">
@@ -637,7 +965,7 @@
       </div>
     </div>
 
-    <div style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div class="input-label">
         <span>할부기간 선택</span>
       </div>
@@ -647,13 +975,13 @@
     <div class="summary-highlight" id="summaryHighlight">
       <div class="main-pay-row">
         <span class="main-pay-label" id="selectedTermTitle">36개월 월납부금액</span>
-        <div class="main-pay-val"><span id="selMonthly" style="font-size: 24px; font-weight: 800;">596,728</span> <span>원</span></div>
+        <div class="main-pay-val"><span id="selMonthly" style="font-size: 23px; font-weight: 800;">596,728</span> <span>원</span></div>
       </div>
     </div>
 
     <div class="detail-list">
       <div class="detail-row">
-        <span class="d-label">적용 연이율 (직접 수정 가능)</span>
+        <span class="d-label">적용 연이율 <span class="no-export">(직접 수정 가능)</span></span>
         <div class="inline-edit-box">
           <input type="number" id="selRateInput" step="0.1" min="0" max="30" inputmode="decimal" oninput="onSelectedRateChange(this.value)" />
           <span>%</span>
@@ -678,7 +1006,7 @@
   <div class="card">
     <div class="section-title">
       <span>할부기간별 한눈에 비교</span>
-      <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">좌우 스크롤 가능 →</span>
+      <span class="no-export" style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">좌우 스크롤 가능 →</span>
     </div>
 
     <div class="table-wrap">
@@ -764,9 +1092,7 @@
 
   // BYD DOLPHIN 프로모션 할부금리표 (할부원금 기준)
   function getDolphinPromoRate(months, principal) {
-    if (months === 12) {
-      return 0.0;
-    }
+    if (months === 12) return 0.0;
     if (months === 24) {
       if (principal <= 20000000) return 0.0;
       if (principal <= 26000000) return 0.7;
@@ -793,10 +1119,101 @@
     return 0.0;
   }
 
-  let rateMode = "basic"; // "basic" | "dolphin"
+  let rateMode = "basic";
   let isDolphinCbSelected = false;
   let terms = JSON.parse(JSON.stringify(defaultTerms));
-  let selectedIndex = 2; // 기본 36개월 선택
+  let selectedIndex = 2;
+
+  function updateDocDate() {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const el = document.getElementById("docDateText");
+    if (el) el.textContent = `산출일자: ${yyyy}.${mm}.${dd}`;
+  }
+
+  function printA4() {
+    updateDocDate();
+    window.print();
+  }
+
+  function saveAsPdf() {
+    updateDocDate();
+    const prevTitle = document.title;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+    document.title = `삼성카드_다이렉트오토_견적_${dateStr}`;
+    window.print();
+    setTimeout(() => {
+      document.title = prevTitle;
+    }, 500);
+  }
+
+  async function saveAsImage() {
+    const btn = document.getElementById("saveImgBtn");
+    const origHtml = btn.innerHTML;
+    if (typeof html2canvas === "undefined") {
+      alert("이미지 저장 모듈을 불러오지 못했습니다. 인터넷 연결을 확인하거나 PDF 저장을 이용해 주세요.");
+      return;
+    }
+
+    updateDocDate();
+    btn.innerHTML = "<span>⏳ 생성 중...</span>";
+    btn.disabled = true;
+
+    const prevScrollY = window.scrollY;
+    window.scrollTo(0, 0);
+    document.body.classList.add("capture-mode");
+
+    try {
+      await new Promise((r) => setTimeout(r, 120));
+      const target = document.getElementById("captureArea");
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false
+      });
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+      const fileName = `삼성카드_다이렉트오토_견적_${dateStr}.png`;
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], fileName, { type: "image/png" });
+
+        // iOS / 모바일에서 사진첩 저장이 편리하도록 공유 시트 우선 시도
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "삼성카드 다이렉트 오토 금융 견적"
+            });
+            return;
+          } catch (err) {
+            if (err.name === "AbortError") return;
+          }
+        }
+
+        const link = document.createElement("a");
+        link.download = fileName;
+        link.href = URL.createObjectURL(blob);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }, "image/png");
+    } catch (e) {
+      alert("이미지 생성 중 오류가 발생했습니다. A4 인쇄 또는 PDF 저장을 이용해 주세요.");
+    } finally {
+      document.body.classList.remove("capture-mode");
+      window.scrollTo(0, prevScrollY);
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
+    }
+  }
 
   function formatNumber(num) {
     return Math.round(num).toLocaleString("ko-KR");
@@ -1091,6 +1508,7 @@
   }
 
   // 초기 렌더링
+  updateDocDate();
   recalculateInstallment();
   recalculateCashback();
 </script>
