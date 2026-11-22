@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>다이렉트 오토 금융계산기 (카드할부 & 선납금 캐시백)</title>
+  <title>다이렉트 오토 금융계산기 & 전체 견적서</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
@@ -17,6 +17,10 @@
       --cashback-bg: #e6f7f0;
       --cashback-text: #0a7b4c;
       --cashback-border: #a3e4c7;
+      --burgundy: #7a1c34;
+      --burgundy-dark: #5c1225;
+      --burgundy-light: #fdf2f5;
+      --burgundy-border: #e6b8c4;
       --bg: #f4f6f9;
       --card-bg: #ffffff;
       --text-main: #191f28;
@@ -38,7 +42,7 @@
       background-color: var(--bg);
       color: var(--text-main);
       line-height: 1.5;
-      padding-bottom: 40px;
+      padding-bottom: 48px;
     }
 
     header {
@@ -85,13 +89,12 @@
       color: rgba(255, 255, 255, 0.85);
     }
 
-    /* Action Bar for Print / Image / PDF */
     .export-toolbar {
       max-width: 680px;
-      margin: 12px auto 0;
+      margin: 16px auto 0;
       padding: 0 14px;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
@@ -100,9 +103,9 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      height: 40px;
+      height: 42px;
       border-radius: 10px;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       border: 1.5px solid var(--border);
@@ -129,45 +132,10 @@
       background: var(--dolphin-light);
     }
 
-    .export-btn.btn-pdf {
-      border-color: var(--cashback-text);
-      color: var(--cashback-text);
-      background: var(--cashback-bg);
-    }
-
     .container {
       max-width: 680px;
       margin: 0 auto;
       padding: 12px 14px 14px;
-    }
-
-    /* Print / Capture Header (Hidden on normal screen, visible in print & image export) */
-    .doc-header {
-      display: none;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-bottom: 2px solid var(--primary);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-
-    .doc-header-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--primary-dark);
-      letter-spacing: -0.4px;
-    }
-
-    .doc-header-sub {
-      font-size: 11.5px;
-      color: var(--text-sub);
-      margin-top: 2px;
-    }
-
-    .doc-header-date {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-align: right;
     }
 
     .card {
@@ -229,7 +197,6 @@
       background: #e5e8eb;
     }
 
-    /* Promo Mode Selector */
     .mode-switch {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -416,7 +383,6 @@
       border-color: var(--dolphin);
     }
 
-    /* Term Tabs */
     .term-tabs {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -460,7 +426,6 @@
       opacity: 0.88;
     }
 
-    /* Highlight Summary Box */
     .summary-highlight {
       background: var(--primary-light);
       border-radius: 14px;
@@ -506,7 +471,6 @@
       font-weight: 600;
     }
 
-    /* Cashback Result Box */
     .cashback-highlight {
       background: var(--cashback-bg);
       border: 1px solid var(--cashback-border);
@@ -546,7 +510,6 @@
       color: var(--dolphin);
     }
 
-    /* Detail Rows */
     .detail-list {
       display: flex;
       flex-direction: column;
@@ -596,7 +559,6 @@
       margin-left: 3px;
     }
 
-    /* All Terms Comparison Table */
     .table-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -661,6 +623,161 @@
       background: #ffffff;
     }
 
+    /* Bottom Full Quote Sheet Section */
+    .quote-sheet-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 22px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(16, 50, 97, 0.07);
+      border: 1.5px solid #c9daf0;
+    }
+
+    .quote-sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--primary-dark);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+
+    .quote-sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .quote-sheet-subtitle {
+      font-size: 11.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .quote-sheet-meta {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-align: right;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .quote-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .quote-meta-item {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 11px;
+    }
+
+    .quote-meta-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .quote-meta-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .quote-block-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 12px 0 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .quote-table {
+      width: 100%;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .quote-table th,
+    .quote-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .quote-table th {
+      text-align: left;
+      background: #f8fafc;
+      color: var(--text-sub);
+      font-weight: 600;
+      width: 44%;
+    }
+
+    .quote-table td {
+      text-align: right;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* 견적서 요약 내 버건디 강조 행 */
+    .quote-table tr.row-burgundy th {
+      color: var(--burgundy-dark);
+      background: var(--burgundy-light);
+      font-weight: 700;
+    }
+
+    .quote-table tr.row-burgundy td {
+      color: var(--burgundy);
+      background: var(--burgundy-light);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .quote-memo-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 8px;
+    }
+
+    .quote-memo-box textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.45;
+      outline: none;
+      min-height: 44px;
+    }
+
+    .quote-footer-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      line-height: 1.45;
+    }
+
     .footer-note {
       font-size: 11.5px;
       color: var(--text-muted);
@@ -669,62 +786,31 @@
       line-height: 1.45;
     }
 
-    /* Capture Mode (for clean Image export) */
+    /* Capture Mode: 오직 하단 전체 견적서 요약(#fullQuoteSheet)만 캡처 */
     body.capture-mode {
       background: #ffffff;
-      padding-bottom: 0;
-    }
-
-    body.capture-mode .container {
-      width: 680px;
-      max-width: 680px;
-      background: #ffffff;
-      padding: 24px;
-    }
-
-    body.capture-mode .doc-header {
-      display: flex;
-    }
-
-    body.capture-mode .no-export,
-    body.capture-mode .quick-amounts,
-    body.capture-mode .reset-btn,
-    body.capture-mode .mode-switch {
-      display: none !important;
-    }
-
-    body.capture-mode .card {
-      box-shadow: none;
-      border: 1px solid #d0d7de;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-    }
-
-    body.capture-mode .input-box {
-      height: 38px;
-      background: #f8fafc;
-      border: 1px solid #d0d7de;
-    }
-
-    body.capture-mode .input-box input {
-      font-size: 16px;
-    }
-
-    body.capture-mode .table-wrap {
-      overflow: visible;
-      margin: 0;
       padding: 0;
     }
 
-    body.capture-mode table {
-      min-width: 100%;
+    body.capture-mode .quote-sheet-card {
+      width: 640px;
+      max-width: 640px;
+      margin: 0;
+      box-shadow: none;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      background: #ffffff;
     }
 
-    /* A4 Single-Page Print Styles */
+    body.capture-mode .no-export {
+      display: none !important;
+    }
+
+    /* Print Styles: 프린트/PDF 시 오직 하단 전체 견적서 요약(#fullQuoteSheet)만 출력 */
     @page {
       size: A4 portrait;
-      margin: 10mm 12mm;
+      margin: 14mm 15mm;
     }
 
     @media print {
@@ -737,16 +823,13 @@
         background: #ffffff !important;
         padding: 0 !important;
         margin: 0 !important;
-        font-size: 12px !important;
-        line-height: 1.35 !important;
       }
 
       header,
       .export-toolbar,
-      .no-export,
-      .quick-amounts,
-      .reset-btn,
-      .mode-switch {
+      .calc-only,
+      .footer-note,
+      .no-export {
         display: none !important;
       }
 
@@ -757,134 +840,29 @@
         margin: 0 !important;
       }
 
-      .doc-header {
-        display: flex !important;
-        margin-bottom: 10px !important;
-        padding-bottom: 8px !important;
-      }
-
-      .card {
+      .quote-sheet-card {
         box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 10px !important;
-        padding: 12px 14px !important;
-        margin-bottom: 9px !important;
+        border: 1.5px solid #94a3b8 !important;
+        border-radius: 12px !important;
+        padding: 22px 24px !important;
+        margin: 0 !important;
+        width: 100% !important;
         break-inside: avoid;
         page-break-inside: avoid;
       }
 
-      .section-title {
-        font-size: 13.5px !important;
-        margin-bottom: 8px !important;
+      .quote-sheet-title {
+        font-size: 20px !important;
       }
 
-      .promo-notice,
-      .cb-promo-notice {
-        padding: 6px 10px !important;
-        margin-bottom: 8px !important;
-        margin-top: 6px !important;
-        font-size: 11px !important;
-      }
-
-      .input-group {
-        margin-bottom: 8px !important;
-      }
-
-      .input-label {
-        font-size: 12px !important;
-        margin-bottom: 4px !important;
-      }
-
-      .input-box {
-        height: 34px !important;
-        border-radius: 8px !important;
-        background: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
-      }
-
-      .input-box input {
-        font-size: 15px !important;
-      }
-
-      .term-tabs {
-        margin-bottom: 8px !important;
-        gap: 5px !important;
-      }
-
-      .term-tab {
-        padding: 6px 4px !important;
-        border-radius: 8px !important;
-      }
-
-      .term-tab .t-month {
-        font-size: 12px !important;
-      }
-
-      .term-tab .t-rate {
-        font-size: 10px !important;
-      }
-
-      .summary-highlight,
-      .cashback-highlight {
+      .quote-table th,
+      .quote-table td {
         padding: 10px 12px !important;
-        margin-bottom: 8px !important;
-        margin-top: 8px !important;
-        border-radius: 9px !important;
+        font-size: 13.5px !important;
       }
 
-      .main-pay-val,
-      .cb-row-main .cb-val {
-        font-size: 19px !important;
-      }
-
-      .detail-list {
-        gap: 5px !important;
-      }
-
-      .detail-row {
-        font-size: 12px !important;
-      }
-
-      .inline-edit-box {
-        padding: 2px 6px !important;
-        width: 82px !important;
-      }
-
-      .inline-edit-box input {
-        font-size: 12.5px !important;
-      }
-
-      .table-wrap {
-        overflow: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      table {
-        min-width: 100% !important;
-        font-size: 11.5px !important;
-      }
-
-      th, td {
-        padding: 5px 6px !important;
-      }
-
-      th:first-child, td:first-child {
-        position: static !important;
-        box-shadow: none !important;
-      }
-
-      .mini-input {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        width: 44px !important;
-        font-size: 11.5px !important;
-      }
-
-      .footer-note {
-        font-size: 10px !important;
-        margin-top: 6px !important;
+      .quote-table tr.row-burgundy td {
+        font-size: 14.5px !important;
       }
     }
   </style>
@@ -895,36 +873,15 @@
   <div class="header-inner">
     <div class="header-top">
       <h1>다이렉트 오토 금융계산기</h1>
-      <span class="badge">카드할부 · 돌핀 프로모션 · 캐시백</span>
+      <span class="badge">카드할부 · 돌핀 프로모션 · 캐시백 · 견적서</span>
     </div>
-    <p>기본 금리와 BYD DOLPHIN 프로모션 할부금리, 선납금 캐시백을 계산할 수 있습니다.</p>
+    <p>할부 및 선납금 캐시백 계산 후 하단 전체 견적서에서 결과를 바로 확인할 수 있습니다.</p>
   </div>
 </header>
 
-<div class="export-toolbar">
-  <button type="button" class="export-btn btn-print" onclick="printA4()">
-    <span>🖨️ A4 인쇄</span>
-  </button>
-  <button type="button" class="export-btn btn-pdf" onclick="saveAsPdf()">
-    <span>📄 PDF 저장</span>
-  </button>
-  <button type="button" class="export-btn btn-img" id="saveImgBtn" onclick="saveAsImage()">
-    <span>🖼️ 사진 저장</span>
-  </button>
-</div>
-
-<div class="container" id="captureArea">
-  <!-- 인쇄 및 이미지 저장 시 상단 제목 영역 -->
-  <div class="doc-header">
-    <div>
-      <div class="doc-header-title">삼성카드 다이렉트 오토 금융 견적 안내</div>
-      <div class="doc-header-sub">카드할부 원리금균등상환 및 선납금(일시불) 캐시백 산출 내역</div>
-    </div>
-    <div class="doc-header-date" id="docDateText"></div>
-  </div>
-
+<div class="container">
   <!-- 1. 카드할부 계산기 영역 -->
-  <div class="card">
+  <div class="card calc-only">
     <div class="section-title">
       <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
         <span>① 카드할부 계산기</span>
@@ -974,7 +931,7 @@
 
     <div class="summary-highlight" id="summaryHighlight">
       <div class="main-pay-row">
-        <span class="main-pay-label" id="selectedTermTitle">36개월 월납부금액</span>
+        <span class="main-pay-label" id="selectedTermTitle">36개월 월납입금</span>
         <div class="main-pay-val"><span id="selMonthly" style="font-size: 23px; font-weight: 800;">596,728</span> <span>원</span></div>
       </div>
     </div>
@@ -1003,7 +960,7 @@
   </div>
 
   <!-- 2. 전체 할부 기간 비교 표 -->
-  <div class="card">
+  <div class="card calc-only">
     <div class="section-title">
       <span>할부기간별 한눈에 비교</span>
       <span class="no-export" style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">좌우 스크롤 가능 →</span>
@@ -1021,8 +978,8 @@
     </div>
   </div>
 
-  <!-- 3. 선납금(일시불) 캐시백 계산기 (별도 분리) -->
-  <div class="card">
+  <!-- 3. 선납금(일시불) 캐시백 계산기 -->
+  <div class="card calc-only">
     <div class="section-title">
       <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
         <span>② 선납금 캐시백 계산기</span>
@@ -1075,10 +1032,103 @@
     </div>
   </div>
 
+  <!-- 4. 하단 전체 견적서 페이지 (프린트 / PDF / 사진 저장 시 이 영역만 출력됨) -->
+  <section class="quote-sheet-card" id="fullQuoteSheet">
+    <div class="quote-sheet-header">
+      <div>
+        <div class="quote-sheet-title">삼성카드 다이렉트 오토 금융 견적서</div>
+        <div class="quote-sheet-subtitle">카드할부 원리금균등상환 및 선납금(일시불) 캐시백 요약</div>
+      </div>
+      <div class="quote-sheet-meta" id="quoteSheetDate">견적일: -</div>
+    </div>
+
+    <div class="quote-meta-grid">
+      <div class="quote-meta-item">
+        <label class="quote-meta-label" for="quoteModelInput">차종 / 트림</label>
+        <input type="text" class="quote-meta-input" id="quoteModelInput" value="BYD DOLPHIN" />
+      </div>
+      <div class="quote-meta-item">
+        <label class="quote-meta-label" for="quoteCustomerInput">고객명</label>
+        <input type="text" class="quote-meta-input" id="quoteCustomerInput" value="VIP 고객님" placeholder="고객명 입력" />
+      </div>
+    </div>
+
+    <div class="quote-block-title">
+      <span>할부 조건 및 상환 내역</span>
+      <span id="qRateModeText" style="font-size: 11.5px; color: var(--text-sub);">기본 금리</span>
+    </div>
+    <table class="quote-table">
+      <tbody>
+        <tr class="row-burgundy">
+          <th>할부사용금액</th>
+          <td id="qPrincipal">20,000,000 원</td>
+        </tr>
+        <tr class="row-burgundy">
+          <th>선택 할부개월수 / 연이율</th>
+          <td id="qTermAndRate">36개월 / 4.7%</td>
+        </tr>
+        <tr class="row-burgundy">
+          <th>월납입금</th>
+          <td id="qMonthly">596,728 원</td>
+        </tr>
+        <tr>
+          <th>총 할부이자</th>
+          <td id="qInterest">1,482,208 원</td>
+        </tr>
+        <tr>
+          <th>할부 총납부금액 (원금 + 이자)</th>
+          <td id="qInstallmentTotal">21,482,208 원</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="quote-block-title">
+      <span>선납금액(일시불) 캐시백 및 카드결제 요약</span>
+    </div>
+    <table class="quote-table">
+      <tbody>
+        <tr class="row-burgundy">
+          <th>선납금액 (일시불 결제금액)</th>
+          <td id="qDownPay">10,000,000 원</td>
+        </tr>
+        <tr class="row-burgundy">
+          <th>캐시백 비율</th>
+          <td id="qCbRate">1.0%</td>
+        </tr>
+        <tr class="row-burgundy">
+          <th>캐시백금액</th>
+          <td id="qCbAmount">+ 100,000 원</td>
+        </tr>
+        <tr>
+          <th>총 카드결제금액 (할부사용금액 + 선납금액)</th>
+          <td id="qCardPrincipalSum">30,000,000 원</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="quote-memo-box" id="quoteMemoBox">
+      <label class="quote-meta-label" for="quoteNoteArea">상담 안내 및 특이사항</label>
+      <textarea id="quoteNoteArea" placeholder="프로모션 조건, 캐시백 지급 시점, 보조금·등록비 안내 등 메모를 입력하세요."></textarea>
+    </div>
+
+    <div class="quote-footer-note">
+      ※ 카드할부(원리금균등상환)와 일시불 선납금 캐시백은 별도로 산출되며, 실제 계약 시점의 금융 조건에 따라 소폭 차이가 발생할 수 있습니다.
+    </div>
+  </section>
+
   <p class="footer-note">
     ※ 카드할부(원리금균등상환)와 일시불 선납금 캐시백은 별도로 산출됩니다.<br/>
     BYD DOLPHIN 프로모션 금리 및 캐시백은 행사 기간(2026.11.16~2026.11.30) 및 상품 조건에 따라 달라질 수 있습니다.
   </p>
+</div>
+
+<div class="export-toolbar">
+  <button type="button" class="export-btn btn-print" onclick="printOrPdf()">
+    <span>프린트 / PDF 저장</span>
+  </button>
+  <button type="button" class="export-btn btn-img" id="saveImgBtn" onclick="saveAsImage()">
+    <span>사진 저장</span>
+  </button>
 </div>
 
 <script>
@@ -1090,7 +1140,6 @@
     { months: 60, rate: 4.8 }
   ];
 
-  // BYD DOLPHIN 프로모션 할부금리표 (할부원금 기준)
   function getDolphinPromoRate(months, principal) {
     if (months === 12) return 0.0;
     if (months === 24) {
@@ -1124,26 +1173,35 @@
   let terms = JSON.parse(JSON.stringify(defaultTerms));
   let selectedIndex = 2;
 
+  let latestQuoteData = {
+    principal: 20000000,
+    months: 36,
+    rate: 4.7,
+    monthly: 596728,
+    interest: 1482208,
+    installmentTotal: 21482208,
+    downPay: 10000000,
+    cbRate: 1.0,
+    cbAmount: 100000
+  };
+
   function updateDocDate() {
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
-    const el = document.getElementById("docDateText");
-    if (el) el.textContent = `산출일자: ${yyyy}.${mm}.${dd}`;
+    const qDate = document.getElementById("quoteSheetDate");
+    if (qDate) qDate.textContent = `견적일: ${yyyy}.${mm}.${dd}`;
   }
 
-  function printA4() {
-    updateDocDate();
-    window.print();
-  }
 
-  function saveAsPdf() {
+
+  function printOrPdf() {
     updateDocDate();
     const prevTitle = document.title;
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
-    document.title = `삼성카드_다이렉트오토_견적_${dateStr}`;
+    document.title = `삼성카드_다이렉트오토_견적서_${dateStr}`;
     window.print();
     setTimeout(() => {
       document.title = prevTitle;
@@ -1154,12 +1212,12 @@
     const btn = document.getElementById("saveImgBtn");
     const origHtml = btn.innerHTML;
     if (typeof html2canvas === "undefined") {
-      alert("이미지 저장 모듈을 불러오지 못했습니다. 인터넷 연결을 확인하거나 PDF 저장을 이용해 주세요.");
+      alert("이미지 저장 모듈을 불러오지 못했습니다. 인터넷 연결을 확인하거나 프린트 / PDF 저장을 이용해 주세요.");
       return;
     }
 
     updateDocDate();
-    btn.innerHTML = "<span>⏳ 생성 중...</span>";
+    btn.innerHTML = "<span>생성 중...</span>";
     btn.disabled = true;
 
     const prevScrollY = window.scrollY;
@@ -1168,7 +1226,7 @@
 
     try {
       await new Promise((r) => setTimeout(r, 120));
-      const target = document.getElementById("captureArea");
+      const target = document.getElementById("fullQuoteSheet");
       const canvas = await html2canvas(target, {
         scale: 2,
         backgroundColor: "#ffffff",
@@ -1178,18 +1236,17 @@
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
-      const fileName = `삼성카드_다이렉트오토_견적_${dateStr}.png`;
+      const fileName = `삼성카드_다이렉트오토_견적서_${dateStr}.png`;
 
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const file = new File([blob], fileName, { type: "image/png" });
 
-        // iOS / 모바일에서 사진첩 저장이 편리하도록 공유 시트 우선 시도
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
               files: [file],
-              title: "삼성카드 다이렉트 오토 금융 견적"
+              title: "삼성카드 다이렉트 오토 금융 견적서"
             });
             return;
           } catch (err) {
@@ -1206,7 +1263,7 @@
         setTimeout(() => URL.revokeObjectURL(link.href), 1000);
       }, "image/png");
     } catch (e) {
-      alert("이미지 생성 중 오류가 발생했습니다. A4 인쇄 또는 PDF 저장을 이용해 주세요.");
+      alert("이미지 생성 중 오류가 발생했습니다. 프린트 / PDF 저장을 이용해 주세요.");
     } finally {
       document.body.classList.remove("capture-mode");
       window.scrollTo(0, prevScrollY);
@@ -1229,6 +1286,39 @@
     if (man > 0) res += man.toLocaleString("ko-KR") + "만 ";
     if (rest > 0 && eok === 0) res += rest.toLocaleString("ko-KR") + " ";
     return res.trim() + "원";
+  }
+
+  function syncQuoteSheet() {
+    const {
+      principal,
+      months,
+      rate,
+      monthly,
+      interest,
+      installmentTotal,
+      downPay,
+      cbRate,
+      cbAmount
+    } = latestQuoteData;
+
+    const modeLabel = rateMode === "dolphin" ? "BYD 돌핀 프로모션 금리" : "기본 금리";
+    const rateDisplay = rate === 0 ? "무이자 (0.0%)" : `${rate.toFixed(1)}%`;
+
+    document.getElementById("qRateModeText").textContent = modeLabel;
+    document.getElementById("qPrincipal").textContent = `${formatNumber(principal)} 원`;
+    document.getElementById("qTermAndRate").textContent = `${months}개월 / ${rateDisplay}`;
+    document.getElementById("qMonthly").textContent = `${formatNumber(monthly)} 원`;
+    document.getElementById("qInterest").textContent = `${formatNumber(interest)} 원`;
+    document.getElementById("qInstallmentTotal").textContent = `${formatNumber(installmentTotal)} 원`;
+
+    document.getElementById("qDownPay").textContent = `${formatNumber(downPay)} 원`;
+    document.getElementById("qCbRate").textContent = isDolphinCbSelected
+      ? `${cbRate.toFixed(1)}% (돌핀 프로모션)`
+      : `${cbRate.toFixed(1)}%`;
+    document.getElementById("qCbAmount").textContent = `+ ${formatNumber(cbAmount)} 원`;
+
+    const cardPrincipalSum = principal + downPay;
+    document.getElementById("qCardPrincipalSum").textContent = `${formatNumber(cardPrincipalSum)} 원`;
   }
 
   function applyRateModeToTerms(principal) {
@@ -1257,11 +1347,14 @@
     document.getElementById("summaryHighlight").className = "summary-highlight" + (isDolphin ? " dolphin-highlight" : "");
     document.getElementById("selTotal").style.color = isDolphin ? "var(--dolphin)" : "var(--primary)";
 
+    if (isDolphin && document.getElementById("quoteModelInput").value.trim() === "") {
+      document.getElementById("quoteModelInput").value = "BYD DOLPHIN";
+    }
+
     applyRateModeToTerms(getPrincipal());
     recalculateInstallment();
   }
 
-  /* --- ① 카드할부 관련 함수 --- */
   function getPrincipal() {
     const raw = document.getElementById("principalInput").value.replace(/[^0-9]/g, "");
     return parseInt(raw, 10) || 0;
@@ -1333,7 +1426,6 @@
     const principal = getPrincipal();
     const isDolphin = rateMode === "dolphin";
 
-    // 상단 개월수 탭 렌더링
     const tabsEl = document.getElementById("termTabs");
     tabsEl.innerHTML = "";
     terms.forEach((t, idx) => {
@@ -1347,13 +1439,12 @@
       tabsEl.appendChild(btn);
     });
 
-    // 선택 개월수 상세 계산
     const cur = terms[selectedIndex];
     const monthly = calcPMT(principal, cur.rate, cur.months);
     const total = monthly * cur.months;
     const interest = Math.max(0, total - principal);
 
-    document.getElementById("selectedTermTitle").textContent = `${cur.months}개월 월납부금액`;
+    document.getElementById("selectedTermTitle").textContent = `${cur.months}개월 월납입금`;
     document.getElementById("selMonthly").textContent = formatNumber(monthly);
 
     if (!skipSelRateInput) {
@@ -1363,7 +1454,13 @@
     document.getElementById("selInterest").textContent = `${formatNumber(interest)} 원`;
     document.getElementById("selTotal").textContent = `${formatNumber(total)} 원`;
 
-    // 전체 비교 테이블 업데이트
+    latestQuoteData.principal = principal;
+    latestQuoteData.months = cur.months;
+    latestQuoteData.rate = cur.rate;
+    latestQuoteData.monthly = monthly;
+    latestQuoteData.interest = interest;
+    latestQuoteData.installmentTotal = total;
+
     const headRow = document.getElementById("tableHeadRow");
     headRow.innerHTML = "<th>할부개월수</th>";
     terms.forEach((t, idx) => {
@@ -1387,7 +1484,6 @@
     const tbody = document.getElementById("tableBody");
     tbody.innerHTML = "";
 
-    // 연이율 행
     const trRate = document.createElement("tr");
     trRate.innerHTML = "<td>연이율 (%)</td>";
     terms.forEach((t, idx) => {
@@ -1424,12 +1520,13 @@
       tbody.appendChild(tr);
     };
 
-    addRow("월납부금액", (r) => r.m);
+    addRow("월납입금", (r) => r.m);
     addRow("총 할부이자", (r) => r.intr);
     addRow("총납부금액", (r) => r.tot);
+
+    syncQuoteSheet();
   }
 
-  /* --- ② 선납금 캐시백 관련 함수 --- */
   function getDownPay() {
     const raw = document.getElementById("downPayInput").value.replace(/[^0-9]/g, "");
     return parseInt(raw, 10) || 0;
@@ -1467,7 +1564,7 @@
       badge.className = "title-tag tag-dolphin";
       notice.className = "cb-promo-notice visible";
       highlight.className = "cashback-highlight dolphin-cb-highlight";
-      label.textContent = "돌핀 5.0% 캐시백 혜택";
+      label.textContent = "돌핀 5.0% 캐시백금액";
     } else {
       dolphinBtn.className = "quick-cb-btn dolphin-cb-btn";
       badge.textContent = "일시불 결제분";
@@ -1505,9 +1602,14 @@
     const cbAmount = Math.round(downPay * (cbRate / 100));
 
     document.getElementById("cbAmountResult").textContent = `+ ${formatNumber(cbAmount)} 원`;
+
+    latestQuoteData.downPay = downPay;
+    latestQuoteData.cbRate = cbRate;
+    latestQuoteData.cbAmount = cbAmount;
+
+    syncQuoteSheet();
   }
 
-  // 초기 렌더링
   updateDocDate();
   recalculateInstallment();
   recalculateCashback();
